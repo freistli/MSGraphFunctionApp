@@ -4,7 +4,7 @@
 
 The .Net Core 3.1/5/6 project will get SPO site activity report. If the site owner of one report item is MS Group Mail, the code gets the ownership by querying MS Graph Groups, and replace the ownerPrincipalName with owners email list in the report. 
   
-And then posts the report to one logic app to continuously operate the records, for example, save to sharepoint list.
+And then posts the report to one logic app to continuously operate the records, for example, save to sharepoint list. (the owner email text column should be multiple lines text type, otherwise single text line is 255 characters maximum, cannot accepte long owners email list)
 
 ***AzureFunction_TimmerTrigger\run.csx*** use the same logic can work in Azure Function App Timer Trigger as well.
 
