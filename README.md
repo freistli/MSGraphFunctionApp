@@ -3,12 +3,8 @@
 ## Description
 
 The .Net Core 3.1/5/6 project will get SPO site activity report. If the site owner of one report item is MS Group Mail, the code gets the ownership by querying MS Graph Groups, and replace the ownerPrincipalName with owners email list in the report. 
- 
-<img src="https://user-images.githubusercontent.com/8623897/173287501-8709c155-29c0-40b9-ac2b-4c2b8d6b17b0.png"  width="700"/>
-
+  
 And then posts the report to one logic app to continuous operate the records, for example, save to sharepoint list.
-
-<img src="https://user-images.githubusercontent.com/8623897/173287649-5a8e0205-4f84-46f1-94d3-632896522ad4.png"  width="100%"/>
 
 ## Prepare: Set 4 environment variables on desktop:
 
