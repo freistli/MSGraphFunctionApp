@@ -160,3 +160,13 @@ namespace MSGraphFunctionApp
     }
 }
 ```
+
+## Try Azure Function version
+
+***AzureFunction_TimmerTrigger\run.csx*** can be used in Timer Trigger Azure Function. It uses the same logic as desktok client. Only difference is output information.
+
+It requires to set 4 Environment variables in Azure AppSettings as well.
+
+![image](https://user-images.githubusercontent.com/8623897/173336487-73e3e3b5-d5bf-4a8d-b94b-22473599a245.png)
+
+
