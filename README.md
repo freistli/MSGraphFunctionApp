@@ -142,7 +142,7 @@ And then posts the report to one logic app to continuous operate the records, fo
 
 </details>
 
-<img src="https://user-images.githubusercontent.com/8623897/173285419-59a5adf3-59ac-4405-b68a-be13144ff776.png"  width="500"/>
+<img src="https://user-images.githubusercontent.com/8623897/173291914-1cb0d0a0-8c53-4ea9-a8e9-a171df982947.png"  width="500"/>
 
 
 ## Build & Run
