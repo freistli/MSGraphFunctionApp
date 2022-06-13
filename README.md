@@ -22,9 +22,11 @@ And then posts the report to one logic app to continuous operate the records, fo
 
 <img src="https://user-images.githubusercontent.com/8623897/173288472-6fdb06c0-0169-4160-88bb-e0cceb90b916.png"  width="500"/>
 
+***LogicAppEndPoint*** is a logic app can accept a post request body which contains a JSON array of SP Site activity items.
+
 <details>
   <summary>
-    ***LogicAppEndPoint*** is a logic app can accept a post request body which contains a JSON array of SP Site activity items. Here is the body JSON Schema
+     Here is the body JSON Schema
   </summary>
   
   ```
