@@ -6,6 +6,8 @@ The .Net Core 3.1/5/6 project will get SPO site activity report. If the site own
   
 And then posts the report to one logic app to continuous operate the records, for example, save to sharepoint list.
 
+***AzureFunction_TimmerTrigger\run.csx*** use the same logic can work in Azure Function App Timer Trigger as well.
+
 ## Prepare: Set 4 environment variables on desktop:
 
 1. ClientID
