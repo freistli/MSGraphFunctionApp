@@ -6,7 +6,7 @@ namespace MSGraphFunctionApp
     {
         static void Main(string[] args)
         {
-            FunAppcs.Run();
+            FunAppcs.RunQuick();
             Console.ReadKey();
         }
     }
