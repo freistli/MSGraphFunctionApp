@@ -169,5 +169,5 @@ It requires to set 4 Environment variables in Azure AppSettings as well.
 
 ![image](https://user-images.githubusercontent.com/8623897/173336487-73e3e3b5-d5bf-4a8d-b94b-22473599a245.png)
 
-![image](https://user-images.githubusercontent.com/8623897/173337220-67243e79-aca1-4d99-997b-77b65dc6e839.png)
+![image](https://user-images.githubusercontent.com/8623897/173337821-64781053-5fef-48ab-9d59-1de3bd2e1b34.png)
 
