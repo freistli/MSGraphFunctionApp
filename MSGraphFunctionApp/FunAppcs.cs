@@ -1,4 +1,22 @@
-﻿using System;
+﻿/*
+# Disclaim
+# Sample Code is provided for the purpose of illustration only and is not intended
+# to be used in a production environment. THIS SAMPLE CODE AND ANY RELATED INFORMATION
+# ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, 
+# INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+# FOR A PARTICULAR PURPOSE. We grant You a nonexclusive, royalty-free right to use and
+# modify the Sample Code and to reproduce and distribute the object code form of the
+# Sample Code, provided that. You agree: (i) to not use Our name, logo, or trademarks 
+# to market Your software product in which the Sample Code is embedded; (ii) to include
+# a valid copyright notice on Your software product in which the Sample Code is embedded;
+# and (iii) to indemnify, hold harmless, and defend Us and Our suppliers from and against
+# any claims or lawsuits, including attorneys’ fees, that arise or result from the use or
+# distribution of the Sample Code
+# Author: freistli@microsoft.com
+# 06/12/2022
+*/
+
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -117,10 +135,10 @@ namespace MSGraphFunctionApp
 
     class FunAppcs
     {
-        static string clientID = Environment.GetEnvironmentVariable("ClientID");
-        static string clientSecret = Environment.GetEnvironmentVariable("ClientSecret");
-        static string tenantID = Environment.GetEnvironmentVariable("tenantID");
-        static string logicApp = Environment.GetEnvironmentVariable("LogicAppEndPoint");
+        static readonly string clientID = Environment.GetEnvironmentVariable("ClientID");
+        static readonly string clientSecret = Environment.GetEnvironmentVariable("ClientSecret");
+        static readonly string tenantID = Environment.GetEnvironmentVariable("TenantID");
+        static readonly string logicApp = Environment.GetEnvironmentVariable("LogicAppEndPoint");
 
         /// <summary>
         /// Get MS Graph Access Token as Application, use Client Secret OAuth Flow.
@@ -174,9 +192,6 @@ namespace MSGraphFunctionApp
 
                 client.DefaultRequestHeaders.Accept.Add(contentType);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                //var postData = JsonConvert.SerializeObject(userRequest);
-                //contentData = new StringContent(postData, Encoding.UTF8, "application/json");
 
                 var response = await client.GetAsync(url);
 
@@ -294,10 +309,9 @@ namespace MSGraphFunctionApp
         /// <summary>
         /// Load groups in memory to reduce MS Graph API calls
         /// </summary>
-        public static async void RunQuick()
+        public static async void RunQuick(string period, string top)
         {
-            string period = "D7";
-            string top = "200";
+            Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
@@ -343,10 +357,9 @@ namespace MSGraphFunctionApp
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
         }
-        public static async void Run()
+        public static async void Run(string period, string top)
         {
-            string period = "D7";
-            string top = "100";
+            Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
