@@ -208,7 +208,7 @@ namespace MSGraphFunctionApp
             return JsonConvert.DeserializeObject<Report>(await GetGraphAsync(url, token));
         }
 
-        static async Task<List<Group>> GetGroupsInMemory(string token,int top=10)
+        static async Task<List<Group>> GetGroupsInMemory(string token,string top)
         {
             var url = $"https://graph.microsoft.com/v1.0/groups?$select=id,mail&$top={top}";
 
@@ -259,7 +259,7 @@ namespace MSGraphFunctionApp
                 {
                     ownerList.Append($"{owner.userPrincipalName};");
                 }
-                return ownerList.ToString();
+                return string.IsNullOrEmpty(ownerList.ToString()) ? spSite.ownerPrincipalName : ownerList.ToString();
             }
             else
             {
@@ -284,7 +284,7 @@ namespace MSGraphFunctionApp
                 {
                     ownerList.Append($"{owner.userPrincipalName};");
                 }
-                return ownerList.ToString();
+                return string.IsNullOrEmpty(ownerList.ToString())? spSite.ownerPrincipalName: ownerList.ToString();
             }
             else
             {
@@ -297,7 +297,7 @@ namespace MSGraphFunctionApp
         public static async void RunQuick()
         {
             string period = "D7";
-            string top = "100";
+            string top = "200";
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
@@ -306,7 +306,7 @@ namespace MSGraphFunctionApp
             var token = await GetAccessToken();
 
             Report report = await SharePointUsageReportQuery(period, token, top);
-            List<Group> groupList = await GetGroupsInMemory(token, 100);
+            List<Group> groupList = await GetGroupsInMemory(token, top);
 
             foreach (var item in report.spSites)
             {
