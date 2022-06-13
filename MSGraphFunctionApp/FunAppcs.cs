@@ -309,7 +309,7 @@ namespace MSGraphFunctionApp
         /// <summary>
         /// Load groups in memory to reduce MS Graph API calls
         /// </summary>
-        public static async void RunQuick(string period, string top)
+        public static async Task RunQuick(string period, string top)
         {
             Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
 
@@ -357,7 +357,7 @@ namespace MSGraphFunctionApp
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
         }
-        public static async void Run(string period, string top)
+        public static async Task Run(string period, string top)
         {
             Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
 
