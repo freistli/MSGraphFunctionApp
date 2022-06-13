@@ -4,7 +4,7 @@
 
 The .Net Core 3.1/5/6 project will get SPO site activity report. If the site owner of one report item is MS Group Mail, the code gets the ownership by querying MS Graph Groups, and replace the ownerPrincipalName with owners email list in the report. 
   
-And then posts the report to one logic app to continuous operate the records, for example, save to sharepoint list.
+And then posts the report to one logic app to continuously operate the records, for example, save to sharepoint list.
 
 ***AzureFunction_TimmerTrigger\run.csx*** use the same logic can work in Azure Function App Timer Trigger as well.
 
@@ -165,7 +165,7 @@ namespace MSGraphFunctionApp
 
 ## Try Azure Function version
 
-***AzureFunction_TimmerTrigger\run.csx*** can be used in Timer Trigger Azure Function. It uses the same logic as desktok client. Only difference is output information.
+***AzureFunction_TimmerTrigger\run.csx*** can be used in Timer Trigger Azure Function. It uses the same logic as desktop client. Only difference is output information.
 
 It requires to set 4 Environment variables in Azure AppSettings as well.
 
