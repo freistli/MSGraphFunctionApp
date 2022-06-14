@@ -24,7 +24,9 @@ namespace MSGraphFunctionApp
     {
         static void Main(string[] args)
         {
-            FunAppcs.RunQuick("D7","200");
+            //FunAppcs.SharePointQueryRunQuick("D7","200");
+            //Console.ReadKey();
+            FunAppcs.TeamsReportRunQuick("D7", "200");
             Console.ReadKey();
         }
     }

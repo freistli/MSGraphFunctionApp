@@ -28,6 +28,42 @@ using System.Linq;
 namespace MSGraphFunctionApp
 {
 
+    public class GroupActivities
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+
+        [JsonProperty("@odata.nextLink")]
+        public string odatanextLink { get; set; }
+
+        [JsonProperty("value")]
+        public GroupActivity[] groupActivities { get; set; }
+    }
+
+    public class GroupActivity
+    {
+        public string odatatype { get; set; }
+        public string groupId { get; set; }
+        public string reportRefreshDate { get; set; }
+        public string groupDisplayName { get; set; }
+        public bool isDeleted { get; set; }
+        public string ownerPrincipalName { get; set; }
+        public string lastActivityDate { get; set; }
+        public string groupType { get; set; }
+        public int memberCount { get; set; }
+        public int externalMemberCount { get; set; }
+        public object exchangeReceivedEmailCount { get; set; }
+        public object sharePointActiveFileCount { get; set; }
+        public object yammerPostedMessageCount { get; set; }
+        public object yammerReadMessageCount { get; set; }
+        public object yammerLikedMessageCount { get; set; }
+        public int exchangeMailboxTotalItemCount { get; set; }
+        public int exchangeMailboxStorageUsedInBytes { get; set; }
+        public int sharePointTotalFileCount { get; set; }
+        public int sharePointSiteStorageUsedInBytes { get; set; }
+        public string reportPeriod { get; set; }
+    }
+
     public class Groups
     {
         [JsonProperty("@odata.context")]
@@ -139,7 +175,7 @@ namespace MSGraphFunctionApp
         static readonly string clientSecret = Environment.GetEnvironmentVariable("ClientSecret");
         static readonly string tenantID = Environment.GetEnvironmentVariable("TenantID");
         static readonly string logicApp = Environment.GetEnvironmentVariable("LogicAppEndPoint");
-
+        static readonly string TeamsQuerylogicApp = Environment.GetEnvironmentVariable("TeamsQueryLogicAppEndPoint");
         /// <summary>
         /// Get MS Graph Access Token as Application, use Client Secret OAuth Flow.
         /// Replace variables for client id, client secret, tenant id.
@@ -152,7 +188,7 @@ namespace MSGraphFunctionApp
             parameters.Add("client_id", clientID);
             parameters.Add("client_secret", clientSecret);
             parameters.Add("scope", "https://graph.microsoft.com/.default");
-            parameters.Add("grant_type", "client_credentials");            
+            parameters.Add("grant_type", "client_credentials");
 
             var client = new HttpClient();
             client.BaseAddress = new Uri("https://login.microsoftonline.com");
@@ -166,7 +202,13 @@ namespace MSGraphFunctionApp
             return data.access_token;
         }
 
-        static async Task<string> InvokeLogicAppPostAsync(string url,Report report)
+        /// <summary>
+        /// Post SharePoint report page to Logic App
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="report"></param>
+        /// <returns></returns>
+        static async Task<string> InvokeSharePointQueryLogicAppPostAsync(string url, Report report)
         {
             var reportString = JsonConvert.SerializeObject(report);
             using (var client = new HttpClient())
@@ -176,6 +218,18 @@ namespace MSGraphFunctionApp
                 return result.StatusCode.ToString();
             }
         }
+
+        static async Task<string> InvokeTeamsQueryLogicAppPostAsync(string url, GroupActivities report)
+        {
+            var reportString = JsonConvert.SerializeObject(report);
+            using (var client = new HttpClient())
+            {
+                var content = new StringContent(reportString, Encoding.UTF8, "application/json");
+                HttpResponseMessage result = await client.PostAsync(new Uri(url), content);
+                return result.StatusCode.ToString();
+            }
+        }
+
         /// <summary>
         /// Call Graph API with Get using HTTPClient
         /// </summary>
@@ -214,7 +268,7 @@ namespace MSGraphFunctionApp
         /// <param name="token">Access Token</param>
         /// <param name="nextLink">If uses Top and have more pages by following nextLink, then use this parameter</param>
         /// <returns></returns>
-        static async Task<Report> SharePointUsageReportQuery(string period, string token,string top, string nextLink = null)
+        static async Task<Report> SharePointUsageReportQuery(string period, string token, string top, string nextLink = null)
         {
             var url = !string.IsNullOrEmpty(nextLink) ?
                 nextLink :
@@ -222,15 +276,32 @@ namespace MSGraphFunctionApp
 
             return JsonConvert.DeserializeObject<Report>(await GetGraphAsync(url, token));
         }
+        /// <summary>
+        /// Query getOffice365GroupsActivityDetail, return site usage report in JSON string. Support pages
+        /// by checking odata.nextLink
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="token"></param>
+        /// <param name="top"></param>
+        /// <param name="nextLink"></param>
+        /// <returns></returns>
+        static async Task<GroupActivities> TeamsGroupUsageReportQuery(string period, string token, string top, string nextLink = null)
+        {
+            var url = !string.IsNullOrEmpty(nextLink) ?
+                nextLink :
+                $"https://graph.microsoft.com/beta/reports/getOffice365GroupsActivityDetail(period='{period}')?$format=application/json&$top={top}";
 
-        static async Task<List<Group>> GetGroupsInMemory(string token,string top)
+            return JsonConvert.DeserializeObject<GroupActivities>(await GetGraphAsync(url, token));
+        }
+
+        static async Task<List<Group>> GetGroupsInMemory(string token, string top)
         {
             var url = $"https://graph.microsoft.com/v1.0/groups?$select=id,mail&$top={top}";
 
             Groups groups = JsonConvert.DeserializeObject<Groups>(await GetGraphAsync(url, token));
             List<Group> groupList = new List<Group>(groups.groups);
 
-            while(!string.IsNullOrEmpty(groups.odatanextLink))
+            while (!string.IsNullOrEmpty(groups.odatanextLink))
             {
                 Console.WriteLine(groups.odatanextLink);
                 groups = JsonConvert.DeserializeObject<Groups>(await GetGraphAsync(groups.odatanextLink, token));
@@ -239,11 +310,11 @@ namespace MSGraphFunctionApp
 
             return groupList;
         }
-            /// <summary>
-            /// Query Groups by group mail
-            /// </summary>
-            /// <returns></returns>
-            static async Task<Groups> GetGroupsByMail(string groupMail, string token)
+        /// <summary>
+        /// Query Groups by group mail
+        /// </summary>
+        /// <returns></returns>
+        static async Task<Groups> GetGroupsByMail(string groupMail, string token)
         {
             var url = $"https://graph.microsoft.com/v1.0/groups?$filter=mail eq '{groupMail}'&$select=id";
 
@@ -270,7 +341,7 @@ namespace MSGraphFunctionApp
                 Groups groups = await GetGroupsByMail(spSite.ownerPrincipalName, token);
                 Owners owners = await GetGroupOwners(groups.groups[0].id, token);
                 StringBuilder ownerList = new StringBuilder();
-                foreach( var owner in owners.users)
+                foreach (var owner in owners.users)
                 {
                     ownerList.Append($"{owner.userPrincipalName};");
                 }
@@ -280,6 +351,25 @@ namespace MSGraphFunctionApp
             {
                 return spSite.ownerPrincipalName;
             }
+        }
+
+        /// <summary>
+        /// Get full owners list for GroupActivity Item
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="groupActivity"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        static async Task<string> GetGroupOwnersQuick(List<Group> groupList, GroupActivity groupActivity, string token)
+        {
+            Owners owners = await GetGroupOwners(groupActivity.groupId, token);
+            StringBuilder ownerList = new StringBuilder();
+            foreach (var owner in owners.users)
+            {
+                ownerList.Append($"{owner.userPrincipalName};");
+            }
+            return string.IsNullOrEmpty(ownerList.ToString()) ? groupActivity.ownerPrincipalName : ownerList.ToString();
+
         }
         /// <summary>
         /// Find matched group in memory groupList
@@ -299,24 +389,73 @@ namespace MSGraphFunctionApp
                 {
                     ownerList.Append($"{owner.userPrincipalName};");
                 }
-                return string.IsNullOrEmpty(ownerList.ToString())? spSite.ownerPrincipalName: ownerList.ToString();
+                return string.IsNullOrEmpty(ownerList.ToString()) ? spSite.ownerPrincipalName : ownerList.ToString();
             }
             else
             {
                 return spSite.ownerPrincipalName;
             }
         }
-        /// <summary>
-        /// Load groups in memory to reduce MS Graph API calls
-        /// </summary>
-        public static async Task RunQuick(string period, string top)
+
+
+        public static async Task TeamsReportRunQuick(string period, string top)
         {
-            Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
+            Console.WriteLine($"C# function (Teams Report) executed with parameters: Period {period} Top {top}");
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
             int count = 0;
-            Console.WriteLine($"C# unction executed at: {DateTime.Now}");
+            Console.WriteLine($"C# function executed at: {DateTime.Now}");
+            var token = await GetAccessToken();
+
+            GroupActivities report = await TeamsGroupUsageReportQuery(period, token, top);
+            List<Group> groupList = await GetGroupsInMemory(token, top);
+
+            foreach (var item in report.groupActivities)
+            {
+                item.ownerPrincipalName = await GetGroupOwnersQuick(groupList, item, token);
+                Console.WriteLine($"{item.groupDisplayName} - {item.ownerPrincipalName}");
+            }
+
+            var result = await InvokeTeamsQueryLogicAppPostAsync(TeamsQuerylogicApp, report);
+            Console.WriteLine(result);
+
+            count += report.groupActivities.Length;
+
+            while (!string.IsNullOrEmpty(report.odatanextLink))
+            {
+                report = await TeamsGroupUsageReportQuery(period, token, top, report.odatanextLink);
+                Console.WriteLine(report.odatanextLink);
+
+                foreach (var item in report.groupActivities)
+                {
+                    item.ownerPrincipalName = await GetGroupOwnersQuick(groupList, item, token);
+                    Console.WriteLine($"{item.groupDisplayName} - {item.ownerPrincipalName}");
+                }
+
+                result = await InvokeTeamsQueryLogicAppPostAsync(TeamsQuerylogicApp, report);
+                Console.WriteLine(result);
+
+                count += report.groupActivities.Length;
+            }
+
+            Console.WriteLine($"C# function (Teams Report) finished at: {DateTime.Now}");
+            Console.WriteLine($"{count} items are processed.");
+            watch.Stop();
+            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
+        }
+
+        /// <summary>
+        /// Load groups in memory to reduce MS Graph API calls
+        /// </summary>
+        public static async Task SharePointQueryRunQuick(string period, string top)
+        {
+            Console.WriteLine($"C# function (SharePoint Report) executed with parameters: Period {period} Top {top}");
+
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            int count = 0;
+            Console.WriteLine($"C# function executed at: {DateTime.Now}");
             var token = await GetAccessToken();
 
             Report report = await SharePointUsageReportQuery(period, token, top);
@@ -328,7 +467,7 @@ namespace MSGraphFunctionApp
                 Console.WriteLine($"{item.siteUrl} {item.ownerDisplayName} {item.ownerPrincipalName}");
             }
 
-            var result = await InvokeLogicAppPostAsync(logicApp,
+            var result = await InvokeSharePointQueryLogicAppPostAsync(logicApp,
                 report);
             Console.WriteLine(result);
 
@@ -345,26 +484,25 @@ namespace MSGraphFunctionApp
                     Console.WriteLine($"{item.siteUrl} {item.ownerDisplayName} {item.ownerPrincipalName}");
                 }
 
-                result = await InvokeLogicAppPostAsync(logicApp,
-                report);
+                result = await InvokeSharePointQueryLogicAppPostAsync(logicApp,report);
                 Console.WriteLine(result);
 
                 count += report.spSites.Length;
             }
 
-            Console.WriteLine($"C# unction finished at: {DateTime.Now}");
+            Console.WriteLine($"C# function (SharePoint Report) finished at: {DateTime.Now}");
             Console.WriteLine($"{count} items are processed.");
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
         }
-        public static async Task Run(string period, string top)
+        public static async Task SharePointQueryRun(string period, string top)
         {
-            Console.WriteLine($"C# unction executed with parameters: Period {period} Top {top}");
+            Console.WriteLine($"C# function executed with parameters: Period {period} Top {top}");
 
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
             int count = 0;
-            Console.WriteLine($"C# unction executed at: {DateTime.Now}");
+            Console.WriteLine($"C# function executed at: {DateTime.Now}");
             var token = await GetAccessToken();
 
             Report report = await SharePointUsageReportQuery(period, token, top);
@@ -374,9 +512,8 @@ namespace MSGraphFunctionApp
                 item.ownerPrincipalName = await GetSiteOwners(item, token);
                 Console.WriteLine($"{item.siteUrl} {item.ownerDisplayName} {item.ownerPrincipalName}");
             }
-            
-            var result = await InvokeLogicAppPostAsync(logicApp,
-                report);
+
+            var result = await InvokeSharePointQueryLogicAppPostAsync(logicApp,report);
             Console.WriteLine(result);
 
             count += report.spSites.Length;
@@ -389,20 +526,19 @@ namespace MSGraphFunctionApp
                 foreach (var item in report.spSites)
                 {
                     item.ownerPrincipalName = await GetSiteOwners(item, token);
-                    Console.WriteLine($"{item.siteUrl} {item.ownerDisplayName} {item.ownerPrincipalName}");                    
+                    Console.WriteLine($"{item.siteUrl} {item.ownerDisplayName} {item.ownerPrincipalName}");
                 }
 
-                result = await InvokeLogicAppPostAsync(logicApp,
-                report);
+                result = await InvokeSharePointQueryLogicAppPostAsync(logicApp,report);
                 Console.WriteLine(result);
 
                 count += report.spSites.Length;
             }
 
-            Console.WriteLine($"C# unction finished at: {DateTime.Now}");
+            Console.WriteLine($"C# function finished at: {DateTime.Now}");
             Console.WriteLine($"{count} items are processed.");
             watch.Stop();
-            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds/1000} s");
+            Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
         }
 
     }
