@@ -336,6 +336,7 @@ namespace MSGraphFunctionApp
         /// <returns></returns>
         static async Task<string> GetSiteOwners(SPSite spSite, string token)
         {
+            //This Group type means the site is connected with MS 365 Group and owner email is group email
             if (spSite.rootWebTemplate == "Group")
             {
                 Groups groups = await GetGroupsByMail(spSite.ownerPrincipalName, token);
@@ -495,6 +496,13 @@ namespace MSGraphFunctionApp
             watch.Stop();
             Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds / 1000} s");
         }
+
+        /// <summary>
+        /// Didn't store MS Groups in memory. More hits on MS Graph APIs
+        /// </summary>
+        /// <param name="period"></param>
+        /// <param name="top"></param>
+        /// <returns></returns>
         public static async Task SharePointQueryRun(string period, string top)
         {
             Console.WriteLine($"C# function executed with parameters: Period {period} Top {top}");
