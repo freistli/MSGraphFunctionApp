@@ -20,7 +20,7 @@ https://github.com/freistli/MSGraphFunctionApp/blob/master/MSGraphFunctionApp/Fu
 
 ***AzureFunction_TimmerTrigger\run.csx*** use the same logic can work in Azure Function App Timer Trigger as well.
 
-## Prepare: Set 5 environment variables on desktop:
+## Prepare: Set 5 environment variables on Windows Desktop:
 
 1. ClientID
 
@@ -280,10 +280,16 @@ namespace MSGraphFunctionApp
 
 ## Try Azure Function version
 
-***AzureFunction_TimmerTrigger\run.csx*** can be used in Timer Trigger Azure Function. It uses the same logic as desktop client. Only difference is output information.
+[***AzureFunction_TimmerTrigger\run.csx***](https://github.com/freistli/MSGraphFunctionApp/blob/master/MSGraphFunctionApp/AzureFunction_TimmerTrigger/run.csx) can be used in Timer Trigger Azure Function. It uses the same logic as desktop client. Only difference is output information.
 
 It requires to set 5 Environment variables in Azure AppSettings as well.
 
-![image](https://user-images.githubusercontent.com/8623897/173336487-73e3e3b5-d5bf-4a8d-b94b-22473599a245.png)
+### Azure Function App Configuration
+<img src="https://user-images.githubusercontent.com/8623897/173336487-73e3e3b5-d5bf-4a8d-b94b-22473599a245.png"  width="600"/>
+
+### Code Snippet
+<img src="https://user-images.githubusercontent.com/8623897/173512618-a9125be8-673a-468f-98e9-8e9155278014.png"  width="600"/>
+
+### Running Result
 ![image](https://user-images.githubusercontent.com/8623897/173512266-a3ab7a6b-4450-4b7c-a44d-1690d3407433.png)
 
